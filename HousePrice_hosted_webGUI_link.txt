@@ -1,0 +1,11 @@
+Name : Nkemere Chigozirim Goodness
+
+Matric Number: 22CG031888
+
+Machine Learning Algorithm Used: 
+
+Model persistence method used: Pickle
+
+Live URL of the hosted application:
+
+GitHub repository link:
