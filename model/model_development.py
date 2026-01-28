@@ -1,43 +1,62 @@
-# model_development.py
+# model/model_development.py
 import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 import os
 
-# 1. Load the dataset
-try:
-    df = pd.read_csv('train.csv')
-    print("✅ Data loaded successfully.")
-except FileNotFoundError:
-    print("❌ Error: 'train.csv' was not found in this folder.")
-    exit()
+# --- 1. Load the Dataset ---
+# Feedback: Stop execution if dataset isn't found
+data_path = '../train.csv' # Assumes script is in 'model/' folder and csv is in root
+if not os.path.exists(data_path):
+    # Fallback for when running from root
+    data_path = 'train.csv' 
+    if not os.path.exists(data_path):
+        raise FileNotFoundError(f"❌ Error: 'train.csv' not found. Please download the dataset.")
 
-# 2. Select ONLY the features your App expects
-# These MUST match the inputs in app.py
+df = pd.read_csv(data_path)
+print("✅ Dataset loaded successfully.")
+
+# --- 2. Data Preprocessing ---
+# Select the 6 chosen features + Target
 features = ['OverallQual', 'GrLivArea', 'TotalBsmtSF', 'GarageCars', 'FullBath', 'YearBuilt']
 target = 'SalePrice'
 
-# 3. Clean the data
-print("⚙️  Processing data...")
+# Subset data
 X = df[features].copy()
 y = df[target]
 
-# Fill missing values with 0 or median to prevent crashing
+# a. Handling missing values (Fill with median for numerical stability)
 X = X.fillna(X.median())
 
-# 4. Train the Model
-print("🧠 Training Random Forest model...")
-model = RandomForestRegressor(n_estimators=100, random_state=42)
-model.fit(X, y)
+# b. Train-Test Split (Validation Step)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 5. Save the Model
-# Check if 'model' folder exists, if not, create it
+# --- 3. Implement Algorithm ---
+# We use Random Forest (handles non-linear relationships well)
+model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# --- 4. Train the Model ---
+print("🔄 Training the model...")
+model.fit(X_train, y_train)
+
+# --- 5. Evaluate the Model ---
+# Feedback: Report regression metrics before saving
+y_pred = model.predict(X_test)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)
+
+print(f"📊 Model Performance:")
+print(f"   RMSE: ${rmse:,.2f}")
+print(f"   R² Score: {r2:.4f}")
+
+# --- 6. Save the Model ---
+# Ensure the model folder exists
 if not os.path.exists('model'):
     os.makedirs('model')
 
-joblib.dump(model, 'model/house_price_model.pkl')
-
-print("------------------------------------------------------")
-print("🎉 SUCCESS! 'house_price_model.pkl' has been created.")
-print("📂 Location: inside the 'model' folder.")
-print("------------------------------------------------------")
+save_path = 'model/house_price_model.pkl'
+joblib.dump(model, save_path)
+print(f"💾 Model saved to: {save_path}")
