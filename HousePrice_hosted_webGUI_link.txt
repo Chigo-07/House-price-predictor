@@ -2,10 +2,10 @@ Name : Nkemere Chigozirim Goodness
 
 Matric Number: 22CG031888
 
-Machine Learning Algorithm Used: 
+Machine Learning Algorithm Used: RandomForestRegressor
 
-Model persistence method used: Pickle
+Model persistence method used: Joblib
 
-Live URL of the hosted application:
+Live URL of the hosted application: https://house-price-predictor-nmdcxr6zljttvs4zftni62.streamlit.app/
 
-GitHub repository link:
+GitHub repository link: https://github.com/Chigo-07/House-price-predictor.git
